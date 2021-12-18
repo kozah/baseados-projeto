@@ -22,37 +22,37 @@ Somente referenciamos a ontologia FOAF.
 
 \vspace{0.5cm}
 \begin{center}
-\begin{tabular}{cc}
+\begin{tabular}{cl}
     Conceitos & Descrição\\
     \hline
     Filme &
         \begin{tabular}{l}
-            subclasse de foaf:Project
+            subconceito de \verb|foaf:Project|
         \end{tabular}\\
     \hline
     Ator &
         \begin{tabular}{l}
-            subclasse de foaf:Person
+            subconceito de \verb|foaf:Person|
         \end{tabular}\\
     \hline
     Diretor &
         \begin{tabular}{l}
-            subclasse de foaf:Person
+            subconceito de \verb|foaf:Person|
         \end{tabular}\\
     \hline
     Personagem &
         \begin{tabular}{l}
-            subclasse de foaf:Project
+            subconceito de \verb|foaf:Project|
         \end{tabular}\\
     \hline
     Homem &
         \begin{tabular}{l}
-            subclasse de foaf:Agent
+            subconceito de \verb|foaf:Agent|
         \end{tabular}\\
     \hline
     Mulher &
         \begin{tabular}{l}
-            subclasse de foaf:Agent
+            subconceito de \verb|foaf:Agent|
         \end{tabular}\\
     \hline
 \end{tabular}
@@ -60,12 +60,12 @@ Somente referenciamos a ontologia FOAF.
 
 \vspace{0.5cm}
 \begin{center}
-\begin{tabular}{cc}
+\begin{tabular}{cl}
     Propriedade & Descrição\\
     \hline
     atuaEm &
         \begin{tabular}{l}
-            subpropriedade de foaf:made\\
+            subpropriedade de \verb|foaf:made|\\
             inversa de atuadoPor\\
             propriedade assimétrica\\
             domínio: Ator\\
@@ -74,12 +74,12 @@ Somente referenciamos a ontologia FOAF.
     \hline
     atuadoPor &
         \begin{tabular}{l}
-            subpropriedade de foaf:maker
+            subpropriedade de \verb|foaf:maker|
         \end{tabular}\\
     \hline
     dirige &
         \begin{tabular}{l}
-            subpropriedade de foaf:made\\
+            subpropriedade de \verb|foaf:made|\\
             inversa de dirigidoPor\\
             domínio: Diretor\\
             range: Filme
@@ -87,12 +87,12 @@ Somente referenciamos a ontologia FOAF.
     \hline
     dirigidoPor &
         \begin{tabular}{l}
-            subpropriedade de foaf:maker
+            subpropriedade de \verb|foaf:maker|
         \end{tabular}\\
     \hline
     interpreta &
         \begin{tabular}{l}
-            subpropriedade de foaf:made\\
+            subpropriedade de \verb|foaf:made|\\
             inversa de interpretadoPor\\
             domínio: Ator\\
             range: Personagem
@@ -100,7 +100,7 @@ Somente referenciamos a ontologia FOAF.
     \hline
     interpretadoPor &
         \begin{tabular}{l}
-            subpropriedade de foaf:maker
+            subpropriedade de \verb|foaf:maker|
         \end{tabular}\\
     \hline
     temAnoDeLancamento &
@@ -118,17 +118,17 @@ Somente referenciamos a ontologia FOAF.
     \hline
     temPrimeiroNome &
         \begin{tabular}{l}
-            subpropriedade de foaf:firstName\\
+            subpropriedade de \verb|foaf:firstName|\\
             tipo: owl:FunctionalProperty\\
-            domínio: foaf:Person\\
+            domínio: \verb|foaf:Person|\\
             range: string
         \end{tabular}\\
     \hline
     temSobrenome &
         \begin{tabular}{l}
-            subpropriedade de foaf:familyName\\
+            subpropriedade de \verb|foaf:familyName|\\
             tipo: owl:FunctionalProperty\\
-            domínio: foaf:Person\\
+            domínio: \verb|foaf:Person|\\
             range: string
         \end{tabular}\\
     \hline
@@ -137,6 +137,7 @@ Somente referenciamos a ontologia FOAF.
             domínio: Filme\\
             range: string
         \end{tabular}\\
+    \hline
 \end{tabular}
 \end{center}
 
@@ -156,48 +157,157 @@ PREFIX onto: <http://www.semanticweb.org/lincolnyuji/ontologies/2021/10/cinema-o
 \end{verbatim}
 
 \subsection*{Query 1}
-Quais os títulos dos filmes que foram dirigidos pelo diretor D, em ordem lexicográfica?
+Quais os títulos dos filmes que foram dirigidos pelo diretor \textbf{D}, em ordem lexicográfica?
+Com \textbf{D} = onto:ethan\_coen:
 \begin{verbatim}
-SELECT ?filme ?diretor
+SELECT ?TituloDoFilme
 WHERE
 {
-  ?filme rdf:type onto:Filme.
-  ?diretor rdf:type onto:Diretor.
-  ?filme foaf:maker ?diretor.
+  BIND (onto:ethan_coen AS ?D)
+  ?D onto:dirige ?filme.
+  ?filme onto:temTitulo ?TituloDoFilme.
 }
-ORDER BY ?filme
+ORDER BY ?TituloDoFilme
 \end{verbatim}
+\begin{center}
+\begin{tabular}{|l|}
+    \hline
+    TituloDoFilme\\
+    \hline
+    "Barton Fink"\\
+    "Blood Simple"\\
+    "Fargo"\\
+    "Intolerable Cruelty"\\
+    "Miller's Crossing"\\
+    "O Brother, Where Art Thou?"\\
+    "Paris, je t'aime"\\
+    "Raising Arizona"\\
+    "The Hudsucker Proxy"\\
+    "The Ladykillers"\\
+    "The Man Who Wasn't There"\\
+    \hline
+\end{tabular}
+\end{center}
 
 \subsection*{Query 2}
-Quais os primeiros nomes e últimos nomes dos atores que participaram do filme de título F\textsubscript{t}, em ordem lexicográfica de nome e sobrenome, com seus respectivos personagens?
+Quais os primeiros nomes e últimos nomes dos atores que participaram do filme de título \textbf{F\textsubscript{t}}, em ordem lexicográfica de nome e sobrenome, com seus respectivos personagens?
+Com \textbf{F\textsubscript{t}} = "American Beauty".
 \begin{verbatim}
-SELECT ?primeiroNome ?ultimoNome ?personagem
+SELECT ?PrimeiroNome ?UltimoNome ?Personagem
 WHERE
 {
-  ?filme rdf:type onto:Filme.
-  ?pessoa rdf:type foaf:Person.
+  BIND ("American Beauty" AS ?Ft)
+  ?filme onto:temTitulo ?Ft.
   ?pessoa onto:atuaEm ?filme.
-  ?pessoa onto:temPrimeiroNome ?primeiroNome.
-  ?pessoa onto:temSobrenome ?ultimoNome.
-  ?pessoa onto:interpreta ?personagem.
+  ?pessoa onto:temPrimeiroNome ?PrimeiroNome.
+  ?pessoa onto:temSobrenome ?UltimoNome.
+  ?pessoa onto:interpreta ?Personagem.
 }
-ORDER BY ?primeiroNome
+ORDER BY ?PrimeiroNome ?UltimoNome
 \end{verbatim}
 
+\begin{center}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        PrimeiroNome & UltimoNome & Personagem \\
+        \hline
+        "Alison"   & "Faulk"   & personagem\_spartanette\_1   \\
+        "Allison"   & "Janney"   & personagem\_barbara\_fitts   \\
+        "Amber"   & "Smith"   & personagem\_christy\_kane   \\
+        "Annette"   & "Bening"   & personagem\_carolyn\_burnham   \\
+        "Ara"   & "Celi"   & personagem\_sale\_house\_woman\_1   \\
+        "Barry"   & "Sherman"   & personagem\_brad\_dupree   \\
+        "Brenda"   & "Wehle"   & personagem\_sale\_house\_woman\_4   \\
+        "Carolina"   & "Lancaster"   & personagem\_spartanette\_4   \\
+        "Chekeshka"   & "Putten"   & personagem\_spartanette\_6   \\
+        "Chelsea"   & "Hertford"   & personagem\_playground\_girl\_2   \\
+        "Chris"   & "Cooper"   & personagem\_col\_frank\_fitts\_usmc   \\
+        "Chris"   & "Cooper"   & personagem\_frank\_booker   \\
+        "Dennis"   & "Anderson"   & personagem\_mr\_smiley\_s\_manager   \\
+        "Elaine"   & "Kendall"   & personagem\_newscaster   \\
+        "Emily"   & "Zachary"   & personagem\_spartanette\_7   \\
+        "Erin"   & "Strubbe"   & personagem\_young\_jane\_burnham   \\
+        "Fort"   & "Atkinson"   & personagem\_sale\_house\_man\_2   \\
+        "Heather"   & "Sher"   & personagem\_playground\_girl\_1   \\
+        "Joel"   & "McCrary"   & personagem\_catering\_boss   \\
+        "John"   & "Cho"   & personagem\_petey   \\
+        "John"   & "Cho"   & personagem\_sale\_house\_man\_1   \\
+        "Kent"   & "Faulcon"   & personagem\_sale\_house\_man\_3   \\
+        "Kevin"   & "Spacey"   & personagem\_lester\_burnham   \\
+        "Kevin"   & "Spacey"   & personagem\_roger\_verbal\_kint   \\
+        "Krista"   & "Goodsitt"   & personagem\_spartanette\_2   \\
+        "Lily"   & "Houtkin"   & personagem\_spartanette\_3   \\
+        "Lisa"   & "Cloud"   & personagem\_sale\_house\_woman\_5   \\
+        "Marissa"   & "Winokur"   & personagem\_mr\_smiley\_s\_counter\_girl   \\
+        "Matthew"   & "Kimbrough"   & personagem\_firing\_range\_attendant   \\
+        "Mena"   & "Suvari"   & personagem\_angela\_hayes   \\
+        "Nancy"   & "Anderson"   & personagem\_spartanette\_8   \\
+        "Peter"   & "Gallagher"   & personagem\_buddy\_kane   \\
+        "Peter"   & "Gallagher"   & personagem\_vic\_tenetta\_party\_singer   \\
+        "Reshma"   & "Gajjar"   & personagem\_spartanette\_9   \\
+        "Romana"   & "Leah"   & personagem\_spartanette\_5   \\
+        "Sam"   & "Robards"   & personagem\_jim\_berkley   \\
+        "Scott"   & "Bakula"   & personagem\_jim\_olmeyer   \\
+        "Stephanie"   & "Rizzo"   & personagem\_spartanette\_10   \\
+        "Sue"   & "Casey"   & personagem\_sale\_house\_woman\_2   \\
+        "Thora"   & "Birch"   & personagem\_enid   \\
+        "Thora"   & "Birch"   & personagem\_jane\_burnham   \\
+        "Wes"   & "Bentley"   & personagem\_ricky\_fitts   \\
+        \hline
+    \end{tabular}
+\end{center}
+
 \subsection*{Query 3}
-Em quais filmes os atores X e Y atuaram juntos, com os respectivos diretores e anos de lançamento, do mais novo para o mais antigo?
+Em quais filmes os atores \textbf{X} e \textbf{Y} atuaram juntos, com os respectivos diretores e anos de lançamento, do mais novo para o mais antigo?
+
+Com \textbf{X} = onto:ben\_gazzara e \textbf{Y} = onto:steve\_buscemi
+
 \begin{verbatim}
-SELECT ?pessoa ?filme ?ano
+SELECT ?Filme ?Diretor ?Ano
 WHERE
 {
-  onto:sofia_coppola onto:atuaEm ?filme.
-  ?pessoa onto:atuaEm ?filme.
-  FILTER (?pessoa != onto:sofia_coppola).
-  ?filme foaf:maker onto:francis_ford_coppola.
-  ?filme onto:temAnoDeLancamento ?ano.
+  BIND (onto:ben_gazzara AS ?X)
+  BIND (onto:steve_buscemi AS ?Y)
+  ?X onto:atuaEm ?Filme.
+  ?Y onto:atuaEm ?Filme.
+  FILTER (?X != ?Y).
+  ?Diretor onto:dirige ?Filme.
+  ?Filme onto:temAnoDeLancamento ?Ano.
 }
-ORDER BY DESC(?ano)
+ORDER BY DESC(?Ano)
+
+
 \end{verbatim}
+
+\begin{center}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Filme & Diretor & Ano \\
+        \hline
+        filme\_paris\_je\_t\_aime   & alexander\_payne   & 2006   \\
+        filme\_paris\_je\_t\_aime   & alfonso\_cuar\_n   & 2006   \\
+        filme\_paris\_je\_t\_aime   & anne\_marie\_mi\_ville   & 2006   \\
+        filme\_paris\_je\_t\_aime   & christoffer\_boe   & 2006   \\
+        filme\_paris\_je\_t\_aime   & daniela\_thomas   & 2006   \\
+        filme\_paris\_je\_t\_aime   & ethan\_coen   & 2006   \\
+        filme\_paris\_je\_t\_aime   & ettore\_scola   & 2006   \\
+        filme\_paris\_je\_t\_aime   & fr\_d\_ric\_auburtin   & 2006   \\
+        filme\_paris\_je\_t\_aime   & g\_rard\_depardieu   & 2006   \\
+        filme\_paris\_je\_t\_aime   & gus\_van\_sant   & 2006   \\
+        filme\_paris\_je\_t\_aime   & isabel\_coixet   & 2006   \\
+        filme\_paris\_je\_t\_aime   & jean\_luc\_godard   & 2006   \\
+        filme\_paris\_je\_t\_aime   & joel\_coen   & 2006   \\
+        filme\_paris\_je\_t\_aime   & nobuhiro\_suwa   & 2006   \\
+        filme\_paris\_je\_t\_aime   & oliver\_schmitz   & 2006   \\
+        filme\_paris\_je\_t\_aime   & olivier\_assayas   & 2006   \\
+        filme\_paris\_je\_t\_aime   & richard\_lagravenese   & 2006   \\
+        filme\_paris\_je\_t\_aime   & sylvain\_chomet   & 2006   \\
+        filme\_paris\_je\_t\_aime   & tom\_tykwer   & 2006   \\
+        filme\_paris\_je\_t\_aime   & vincenzo\_natali   & 2006   \\
+        filme\_paris\_je\_t\_aime   & walter\_salles   & 2006   \\
+        filme\_the\_big\_lebowski   & joel\_coen   & 1998   \\
+    \end{tabular}
+\end{center}
 
 \subsection*{Query 4}
 Quais filmes do diretor do filme F possuem X ou Y como atores, com as respectivas durações em ordem crescente?
