@@ -1,0 +1,317 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[left=2cm, right=2cm, top=2cm]{geometry}
+\usepackage[portuguese]{babel}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{amsfonts}
+
+\begin{document}
+\title{MAC0444 - Sistemas Baseados em Conhecimento \\ \large{Relatório do Projeto}}
+
+\author{Lincoln Oliveira - NUSP: \\
+    Marcos Castello - NUSP: \\
+    Matheus S. Freire - NUSP: \\
+    Natália Hitomi Koza - NUSP: 10698432}
+\maketitle
+
+\section*{Ontologia}
+
+Somente referenciamos a ontologia FOAF.
+
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tabular}{cc}
+    Conceitos & Descrição\\
+    \hline
+    Filme &
+        \begin{tabular}{l}
+            subclasse de foaf:Project
+        \end{tabular}\\
+    \hline
+    Ator &
+        \begin{tabular}{l}
+            subclasse de foaf:Person
+        \end{tabular}\\
+    \hline
+    Diretor &
+        \begin{tabular}{l}
+            subclasse de foaf:Person
+        \end{tabular}\\
+    \hline
+    Personagem &
+        \begin{tabular}{l}
+            subclasse de foaf:Project
+        \end{tabular}\\
+    \hline
+    Homem &
+        \begin{tabular}{l}
+            subclasse de foaf:Agent
+        \end{tabular}\\
+    \hline
+    Mulher &
+        \begin{tabular}{l}
+            subclasse de foaf:Agent
+        \end{tabular}\\
+    \hline
+\end{tabular}
+\end{center}
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tabular}{cc}
+    Propriedade & Descrição\\
+    \hline
+    atuaEm &
+        \begin{tabular}{l}
+            subpropriedade de foaf:made\\
+            inversa de atuadoPor\\
+            propriedade assimétrica\\
+            domínio: Ator\\
+            range: Filme
+        \end{tabular}\\
+    \hline
+    atuadoPor &
+        \begin{tabular}{l}
+            subpropriedade de foaf:maker
+        \end{tabular}\\
+    \hline
+    dirige &
+        \begin{tabular}{l}
+            subpropriedade de foaf:made\\
+            inversa de dirigidoPor\\
+            domínio: Diretor\\
+            range: Filme
+        \end{tabular}\\
+    \hline
+    dirigidoPor &
+        \begin{tabular}{l}
+            subpropriedade de foaf:maker
+        \end{tabular}\\
+    \hline
+    interpreta &
+        \begin{tabular}{l}
+            subpropriedade de foaf:made\\
+            inversa de interpretadoPor\\
+            domínio: Ator\\
+            range: Personagem
+        \end{tabular}\\
+    \hline
+    interpretadoPor &
+        \begin{tabular}{l}
+            subpropriedade de foaf:maker
+        \end{tabular}\\
+    \hline
+    temAnoDeLancamento &
+        \begin{tabular}{l}
+            tipo: owl:FunctionalProperty\\
+            domínio: Filme\\
+            range: inteiro
+        \end{tabular}\\
+    \hline
+    temDuracao &
+        \begin{tabular}{l}
+        domínio: Filme\\
+        range: inteiro
+        \end{tabular}\\
+    \hline
+    temPrimeiroNome &
+        \begin{tabular}{l}
+            subpropriedade de foaf:firstName\\
+            tipo: owl:FunctionalProperty\\
+            domínio: foaf:Person\\
+            range: string
+        \end{tabular}\\
+    \hline
+    temSobrenome &
+        \begin{tabular}{l}
+            subpropriedade de foaf:familyName\\
+            tipo: owl:FunctionalProperty\\
+            domínio: foaf:Person\\
+            range: string
+        \end{tabular}\\
+    \hline
+    temTitulo &
+        \begin{tabular}{l}
+            domínio: Filme\\
+            range: string
+        \end{tabular}\\
+\end{tabular}
+\end{center}
+
+Instâncias:
+
+\section*{Consultas}
+
+Para todas as consultas os prefixos são:
+
+\begin{verbatim}
+PREFIX  rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX onto: <http://www.semanticweb.org/lincolnyuji/ontologies/2021/10/cinema-ontology#>
+\end{verbatim}
+
+\subsection*{Query 1}
+Quais os títulos dos filmes que foram dirigidos pelo diretor D, em ordem lexicográfica?
+\begin{verbatim}
+SELECT ?filme ?diretor
+WHERE
+{
+  ?filme rdf:type onto:Filme.
+  ?diretor rdf:type onto:Diretor.
+  ?filme foaf:maker ?diretor.
+}
+ORDER BY ?filme
+\end{verbatim}
+
+\subsection*{Query 2}
+Quais os primeiros nomes e últimos nomes dos atores que participaram do filme de título F\textsubscript{t}, em ordem lexicográfica de nome e sobrenome, com seus respectivos personagens?
+\begin{verbatim}
+SELECT ?primeiroNome ?ultimoNome ?personagem
+WHERE
+{
+  ?filme rdf:type onto:Filme.
+  ?pessoa rdf:type foaf:Person.
+  ?pessoa onto:atuaEm ?filme.
+  ?pessoa onto:temPrimeiroNome ?primeiroNome.
+  ?pessoa onto:temSobrenome ?ultimoNome.
+  ?pessoa onto:interpreta ?personagem.
+}
+ORDER BY ?primeiroNome
+\end{verbatim}
+
+\subsection*{Query 3}
+Em quais filmes os atores X e Y atuaram juntos, com os respectivos diretores e anos de lançamento, do mais novo para o mais antigo?
+\begin{verbatim}
+SELECT ?pessoa ?filme ?ano
+WHERE
+{
+  onto:sofia_coppola onto:atuaEm ?filme.
+  ?pessoa onto:atuaEm ?filme.
+  FILTER (?pessoa != onto:sofia_coppola).
+  ?filme foaf:maker onto:francis_ford_coppola.
+  ?filme onto:temAnoDeLancamento ?ano.
+}
+ORDER BY DESC(?ano)
+\end{verbatim}
+
+\subsection*{Query 4}
+Quais filmes do diretor do filme F possuem X ou Y como atores, com as respectivas durações em ordem crescente?
+\begin{verbatim}
+SELECT ?filme ?duracao ?ator2
+WHERE
+{
+  ?filme onto:dirigidoPor onto:francis_ford_coppola.
+  {onto:a_j_cook onto:atuaEm ?filme} UNION {?ator2 onto:atuaEm ?filme}.
+  ?filme onto:temDuracao ?duracao.
+}
+ORDER BY ?duracao
+\end{verbatim}
+
+\subsection*{Query 5}
+Quais pessoas atuaram em um filme e dirigiram algum filme (não necessariamente o mesmo filme, mas obrigatoriamente a mesma pessoa)?
+\begin{verbatim}
+SELECT DISTINCT ?pessoa
+WHERE
+{
+  ?pessoa onto:atuaEm ?filme1.
+  ?filme2 onto:dirigidoPor ?pessoa.
+}
+\end{verbatim}
+
+\subsection*{Query 6}
+Quais diretores dirigiram algum filme em um ano entre os anos N1 e N2,  em que os atores X e Y aparecem, do mais antigo para o mais novo?
+\begin{verbatim}
+SELECT DISTINCT ?diretor
+WHERE
+{
+  ?filme onto:temAnoDeLancamento ?ano.
+  FILTER (?ano <= 2000).
+  FILTER (?ano >= 1901).
+  onto:a_j_cook onto:atuaEm ?filme.
+  onto:allen_stewart_coates onto:atuaEm ?filme.
+  ?filme onto:dirigidoPor ?diretor
+}
+ORDER BY ?ano
+\end{verbatim}
+
+\subsection*{Query 7}
+Quais pares formados por uma uma atriz e um ator atuaram juntos em algum filme de duração entre M1 e M2?
+\begin{verbatim}
+SELECT ?atriz ?ator
+WHERE
+{
+  ?atriz rdf:type onto:Mulher.
+  ?ator rdf:type onto:Homem.
+  ?atriz onto:atuaEm ?filme.
+  ?ator onto:atuaEm ?filme.
+  ?filme onto:temDuracao ?duracao.
+  FILTER (?duracao <= 120).
+  FILTER (?duracao >= 80).
+}
+ORDER BY ?duracao
+\end{verbatim}
+
+\subsection{Query 8}
+Qual o diretor que mais dirigiu filmes em que aparece o ator de primeiro nome Xp e último nome Xu?
+\begin{verbatim}
+SELECT ?diretor (count(?filme) as ?quantFilmes)
+WHERE
+{
+  ?pessoa rdf:type foaf:Person.
+  ?pessoa onto:atuaEm ?filme.
+  ?pessoa onto:temPrimeiroNome ?Pnome.
+  ?pessoa foaf:familyName "Coppola".
+  ?diretor onto:dirige ?filme.
+}
+GROUP BY ?diretor
+ORDER BY DESC(?quantFilmes)
+LIMIT 1
+\end{verbatim}
+
+\subsection*{Query 9}
+Qual o filme mais antigo em que o ator X atuou, em que ano foi lançado e qual era seu personagem? Havendo empate, devolver todos
+\begin{verbatim}
+SELECT ?filme ?min_ano
+WHERE
+{
+  ?ator onto:temPrimeiroNome "Alan".
+  ?ator onto:atuaEm ?filme.
+  ?filme onto:temAnoDeLancamento ?ano.
+  FILTER (?ano = ?min_ano).
+  {
+  SELECT (MIN(?ano) as ?min_ano)
+    WHERE
+    {
+      ?ator onto:temPrimeiroNome "Alan".
+      ?ator onto:atuaEm ?filme.
+      ?filme onto:temAnoDeLancamento ?ano.
+    }
+  }
+}
+\end{verbatim}
+
+\subsection*{Query 10}
+Qual o filme mais longo dirigido por D, e qual a sua duração? Havendo empate, devolver todos da mesma duração.
+\begin{verbatim}
+SELECT ?filme ?max_duracao
+WHERE
+{
+  onto:ethan_coen onto:dirige ?filme.
+  ?filme onto:temDuracao ?duracao.
+  FILTER (?duracao = ?max_duracao).
+  {
+  SELECT (MAX(?duracao) as ?max_duracao)
+    WHERE{
+      onto:ethan_coen onto:dirige ?filme.
+      ?filme onto:temDuracao ?duracao.
+    }
+  }
+}
+\end{verbatim}
+
+\end{document}

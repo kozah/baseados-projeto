@@ -1,0 +1,146 @@
+PREFIX  rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX onto: <http://www.semanticweb.org/lincolnyuji/ontologies/2021/10/cinema-ontology#>
+
+#Primeira query
+
+SELECT ?filme ?diretor
+ WHERE 
+{
+  ?filme rdf:type onto:Filme.
+  ?diretor rdf:type onto:Diretor.
+  ?filme foaf:maker ?diretor. 
+}
+ORDER BY ?filme
+
+#Segunda query
+
+SELECT ?primeiroNome ?ultimoNome ?personagem
+  WHERE
+{
+  ?filme rdf:type onto:Filme.
+  ?pessoa rdf:type foaf:Person.
+  ?pessoa onto:atuaEm ?filme.
+  ?pessoa onto:temPrimeiroNome ?primeiroNome.
+  ?pessoa onto:temSobrenome ?ultimoNome.
+  ?pessoa onto:interpreta ?personagem.
+}
+ORDER BY ?primeiroNome
+
+#Terceira query
+
+SELECT ?pessoa ?filme ?ano
+ WHERE
+{
+  onto:sofia_coppola onto:atuaEm ?filme.
+  ?pessoa onto:atuaEm ?filme.
+  FILTER (?pessoa != onto:sofia_coppola).
+  ?filme foaf:maker onto:francis_ford_coppola.
+  ?filme onto:temAnoDeLancamento ?ano.
+}
+ORDER BY DESC(?ano)
+
+#Quarta query
+
+SELECT ?filme ?duracao ?ator2
+ WHERE
+{
+  ?filme onto:dirigidoPor onto:francis_ford_coppola.
+  {onto:a_j_cook onto:atuaEm ?filme} UNION {?ator2 onto:atuaEm ?filme}.
+  ?filme onto:temDuracao ?duracao.
+}
+ORDER BY ?duracao
+
+#Quinta query
+
+SELECT DISTINCT ?pessoa 
+ WHERE
+{
+  ?pessoa onto:atuaEm ?filme1.
+  ?filme2 onto:dirigidoPor ?pessoa.
+}
+
+
+#Sexta query
+
+SELECT DISTINCT ?diretor
+ WHERE
+{
+  ?filme onto:temAnoDeLancamento ?ano.
+  FILTER (?ano <= 2000).
+  FILTER (?ano >= 1901).
+  onto:a_j_cook onto:atuaEm ?filme.
+  onto:allen_stewart_coates onto:atuaEm ?filme.
+  ?filme onto:dirigidoPor ?diretor
+}
+ORDER BY ?ano
+
+#Sétima query
+
+SELECT ?atriz ?ator
+ WHERE
+{
+  ?atriz rdf:type onto:Mulher.
+  ?ator rdf:type onto:Homem.
+  ?atriz onto:atuaEm ?filme.
+  ?ator onto:atuaEm ?filme.
+  ?filme onto:temDuracao ?duracao.
+  FILTER (?duracao <= 120).
+  FILTER (?duracao >= 80).
+}
+ORDER BY ?duracao
+
+#Oitava query
+
+SELECT ?diretor (count(?filme) as ?quantFilmes)
+ WHERE
+{
+  ?pessoa rdf:type foaf:Person.
+  ?pessoa onto:atuaEm ?filme.
+  ?pessoa onto:temPrimeiroNome ?Pnome.
+  ?pessoa foaf:familyName "Coppola".
+  ?diretor onto:dirige ?filme.
+}
+GROUP BY ?diretor
+ORDER BY DESC(?quantFilmes)
+LIMIT 1
+
+#Nona query 
+
+SELECT ?filme ?min_ano
+ WHERE
+{
+  ?ator onto:temPrimeiroNome "Alan".
+  ?ator onto:atuaEm ?filme.
+  ?filme onto:temAnoDeLancamento ?ano.
+  FILTER (?ano = ?min_ano).
+  {
+  SELECT (MIN(?ano) as ?min_ano)
+    WHERE
+    {
+      ?ator onto:temPrimeiroNome "Alan".
+      ?ator onto:atuaEm ?filme.
+      ?filme onto:temAnoDeLancamento ?ano.
+    }
+  }
+}
+
+#Décima query
+
+SELECT ?filme ?max_duracao
+  WHERE 
+{
+  onto:ethan_coen onto:dirige ?filme.
+  ?filme onto:temDuracao ?duracao.
+  FILTER (?duracao = ?max_duracao).
+  {
+  SELECT (MAX(?duracao) as ?max_duracao)
+    WHERE{
+      onto:ethan_coen onto:dirige ?filme.
+      ?filme onto:temDuracao ?duracao.
+    }
+  }
+}
