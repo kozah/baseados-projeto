@@ -306,48 +306,108 @@ ORDER BY DESC(?Ano)
         filme\_paris\_je\_t\_aime   & vincenzo\_natali   & 2006   \\
         filme\_paris\_je\_t\_aime   & walter\_salles   & 2006   \\
         filme\_the\_big\_lebowski   & joel\_coen   & 1998   \\
+        \hline
     \end{tabular}
 \end{center}
 
 \subsection*{Query 4}
-Quais filmes do diretor do filme F possuem X ou Y como atores, com as respectivas durações em ordem crescente?
+Quais filmes do diretor do filme \textbf{F} possuem \textbf{X} ou \textbf{Y} como atores, com as respectivas durações em ordem crescente?
+
+Com \textbf{F} = onto:filme\_her, \textbf{X} = onto:amy\_addams e \textbf{Y} = onto:tim\_szczepanski.
 \begin{verbatim}
-SELECT ?filme ?duracao ?ator2
+SELECT ?Filme ?Duracao
 WHERE
 {
-  ?filme onto:dirigidoPor onto:francis_ford_coppola.
-  {onto:a_j_cook onto:atuaEm ?filme} UNION {?ator2 onto:atuaEm ?filme}.
-  ?filme onto:temDuracao ?duracao.
+  BIND (onto:filme_her AS ?F)
+  BIND (onto:amy_addams AS ?X)
+  BIND (onto:tim_szczepanski AS ?Y)
+  ?Diretor onto:dirige ?F.
+  ?Filme onto:dirigidoPor ?Diretor.
+  {?X onto:atuaEm ?Filme} UNION {?Y onto:atuaEm ?Filme}.
+  ?Filme onto:temDuracao ?Duracao.
 }
-ORDER BY ?duracao
+ORDER BY ?Duracao
 \end{verbatim}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+    \hline
+    Filme & Duracao\\
+    \hline
+    filme\_torrance\_rises & 34\\
+    filme\_her & 126 \\
+    \hline
+\end{tabular}
+\end{center}
 
 \subsection*{Query 5}
 Quais pessoas atuaram em um filme e dirigiram algum filme (não necessariamente o mesmo filme, mas obrigatoriamente a mesma pessoa)?
 \begin{verbatim}
-SELECT DISTINCT ?pessoa
+SELECT DISTINCT ?Pessoa (SAMPLE(?filme1) AS ?FilmeAt) (SAMPLE(?filme2) AS ?FilmeDir)
 WHERE
 {
-  ?pessoa onto:atuaEm ?filme1.
-  ?filme2 onto:dirigidoPor ?pessoa.
+  ?Pessoa onto:atuaEm ?filme1.
+  ?filme2 onto:dirigidoPor ?Pessoa.
 }
+GROUP BY ?Pessoa
 \end{verbatim}
 
+\begin{center}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Pessoa & FilmeAt & FilmeDir \\
+        \hline
+        harold\_ramis   & filme\_ghostbusters   & filme\_groundhog\_day   \\
+        eleanor\_coppola   & filme\_hearts\_of\_darkness\_a\_filmmaker\_s\_apocalypse   & filme\_hearts\_of\_darkness\_a\_filmmaker\_s\_apocalypse   \\
+        woody\_allen   & filme\_scoop   & filme\_scoop   \\
+        george\_lucas   & filme\_hearts\_of\_darkness\_a\_filmmaker\_s\_apocalypse   & filme\_star\_wars\_episode\_i\_\_the\_phantom\_menace   \\
+        ivan\_reitman   & filme\_ghostbusters   & filme\_ghostbusters   \\
+        ethan\_coen   & filme\_down\_from\_the\_mountain   & filme\_raising\_arizona   \\
+        roman\_coppola   & filme\_star\_wars\_episode\_i\_\_the\_phantom\_menace   & filme\_cq   \\
+        denzel\_washington   & filme\_the\_great\_debaters   & filme\_the\_great\_debaters   \\
+        va\_g\_rdos   & filme\_an\_american\_rhapsody   & filme\_an\_american\_rhapsody   \\
+        g\_rard\_depardieu   & filme\_cq   & filme\_paris\_je\_t\_aime   \\
+        sofia\_coppola   & filme\_inside\_monkey\_zetterland   & filme\_lost\_in\_translation   \\
+        spike\_jonze   & filme\_torrance\_rises   & filme\_torrance\_rises   \\
+        francis\_ford\_coppola   & filme\_hearts\_of\_darkness\_a\_filmmaker\_s\_apocalypse   & filme\_rumble\_fish   \\
+        sam\_raimi   & filme\_spies\_like\_us   & filme\_crimewave   \\
+        joel\_coen   & filme\_spies\_like\_us   & filme\_fargo   \\
+        eric\_schaeffer   & filme\_if\_lucy\_fell   & filme\_if\_lucy\_fell   \\
+        stephen\_hillenburg   & filme\_the\_spongebob\_squarepants\_movie   & filme\_the\_spongebob\_squarepants\_movie   \\
+        robert\_redford   & filme\_the\_horse\_whisperer   & filme\_the\_horse\_whisperer   \\
+        \hline
+    \end{tabular}
+\end{center}
+
 \subsection*{Query 6}
-Quais diretores dirigiram algum filme em um ano entre os anos N1 e N2,  em que os atores X e Y aparecem, do mais antigo para o mais novo?
+Quais diretores dirigiram algum filme em um ano entre os anos \textbf{N\textsubscript{1}} e \textbf{N\textsubscript{2}},  em que os atores \textbf{X} e \text{Y} aparecem, do mais antigo para o mais novo?
 \begin{verbatim}
-SELECT DISTINCT ?diretor
+SELECT DISTINCT ?Ano ?Diretor ?Filme
 WHERE
 {
-  ?filme onto:temAnoDeLancamento ?ano.
-  FILTER (?ano <= 2000).
-  FILTER (?ano >= 1901).
-  onto:a_j_cook onto:atuaEm ?filme.
-  onto:allen_stewart_coates onto:atuaEm ?filme.
-  ?filme onto:dirigidoPor ?diretor
+  BIND (1901 AS ?N1)
+  BIND (2000 AS ?N2)
+  BIND (onto:a_j_cook AS ?X)
+  BIND (onto:allen_stewart_coates AS ?Y)
+  ?Filme onto:temAnoDeLancamento ?Ano.
+  FILTER (?Ano <= ?N2).
+  FILTER (?Ano >= ?N1).
+  ?X onto:atuaEm ?Filme.
+  ?Y onto:atuaEm ?Filme.
+  ?Filme onto:dirigidoPor ?Diretor
 }
-ORDER BY ?ano
+ORDER BY ?Ano
 \end{verbatim}
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+    \hline
+    Ano	 & Diretor & Filme\\
+    \hline
+    1999 & sofia\_coppola & filme\_the\_virgin\_suicides\\
+    \hline
+\end{tabular}
+\end{center}
 
 \subsection*{Query 7}
 Quais pares formados por uma uma atriz e um ator atuaram juntos em algum filme de duração entre M1 e M2?
