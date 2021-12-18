@@ -410,9 +410,9 @@ ORDER BY ?Ano
 \end{center}
 
 \subsection*{Query 7}
-Quais pares formados por uma uma atriz e um ator atuaram juntos em algum filme de duração entre M1 e M2?
+Quais pares formados por uma uma atriz e um ator atuaram juntos em algum filme de duração entre \textbf{M1} e \textbf{M2}?
 \begin{verbatim}
-SELECT ?atriz ?ator
+SELECT ?Atriz ?Ator ?Filme ?Duracao
 WHERE
 {
   ?atriz rdf:type onto:Mulher.
@@ -426,62 +426,103 @@ WHERE
 ORDER BY ?duracao
 \end{verbatim}
 
-\subsection{Query 8}
-Qual o diretor que mais dirigiu filmes em que aparece o ator de primeiro nome Xp e último nome Xu?
+\subsection*{Query 8}
+Qual o diretor que mais dirigiu filmes em que aparece o ator de primeiro nome \textbf{X\textsubscript{p}} e último nome \textbf{X\textsubscript{u}}?
+
+Com \textbf{X\textsubscript{p}} = Vincent, \textbf{X\textsubscript{u}} = Coppola
 \begin{verbatim}
-SELECT ?diretor (count(?filme) as ?quantFilmes)
+SELECT ?Diretor
 WHERE
 {
+  BIND ("Vincent" AS ?XP)
+  BIND ("Coppola" AS ?XU)
   ?pessoa rdf:type foaf:Person.
   ?pessoa onto:atuaEm ?filme.
-  ?pessoa onto:temPrimeiroNome ?Pnome.
-  ?pessoa foaf:familyName "Coppola".
-  ?diretor onto:dirige ?filme.
+  ?pessoa onto:temPrimeiroNome ?XP.
+  ?pessoa onto:temSobrenome ?XU.
+  ?Diretor onto:dirige ?filme.
 }
-GROUP BY ?diretor
-ORDER BY DESC(?quantFilmes)
+GROUP BY ?Diretor
+ORDER BY DESC(COUNT(?filme))
 LIMIT 1
 \end{verbatim}
 
+\begin{center}
+\begin{tabular}{|l|}
+    \hline
+    Diretor\\
+    \hline
+    francis\_ford\_coppola\\
+    \hline
+\end{tabular}
+\end{center}
+
 \subsection*{Query 9}
-Qual o filme mais antigo em que o ator X atuou, em que ano foi lançado e qual era seu personagem? Havendo empate, devolver todos
+Qual o filme mais antigo em que o ator \textbf{X} atuou, em que ano foi lançado e qual era seu personagem? Havendo empate, devolver todos.
+Com \textbf{X} = onto:alan\_rachins.
 \begin{verbatim}
-SELECT ?filme ?min_ano
+SELECT ?Filme ?Ano ?Personagem
 WHERE
 {
-  ?ator onto:temPrimeiroNome "Alan".
-  ?ator onto:atuaEm ?filme.
-  ?filme onto:temAnoDeLancamento ?ano.
-  FILTER (?ano = ?min_ano).
+  BIND (onto:alan_rachins AS ?X).
+  ?X onto:atuaEm ?Filme.
+  ?X onto:interpreta ?Personagem.
+  ?Filme onto:temAnoDeLancamento ?anoD.
+  FILTER (?anoD = ?Ano).
   {
-  SELECT (MIN(?ano) as ?min_ano)
+  SELECT (MIN(?anoD) as ?Ano)
     WHERE
     {
-      ?ator onto:temPrimeiroNome "Alan".
-      ?ator onto:atuaEm ?filme.
-      ?filme onto:temAnoDeLancamento ?ano.
+      BIND (onto:alan_rachins AS ?X).
+      ?X onto:atuaEm ?Filme.
+      ?Filme onto:temAnoDeLancamento ?anoD.
     }
   }
 }
 \end{verbatim}
 
+\begin{center}
+\begin{tabular}{|l|l|l|}
+    \hline
+    Filme & Ano	& Personagem\\
+    \hline
+    filme\_north & 1994 & personagem\_defense\_attorney\\
+    \hline
+\end{tabular}
+\end{center}
+
 \subsection*{Query 10}
-Qual o filme mais longo dirigido por D, e qual a sua duração? Havendo empate, devolver todos da mesma duração.
+Qual o filme mais longo dirigido por \textbf{D}, e qual a sua duração? Havendo empate, devolver todos da mesma duração.
+
+Para \textbf{D} = onto:ethan\_coen.
 \begin{verbatim}
-SELECT ?filme ?max_duracao
+SELECT ?Filme ?Duracao
 WHERE
 {
-  onto:ethan_coen onto:dirige ?filme.
-  ?filme onto:temDuracao ?duracao.
-  FILTER (?duracao = ?max_duracao).
+  BIND (onto:ethan_coen AS ?D)
+  ?D onto:dirige ?Filme.
+  ?Filme onto:temDuracao ?duracaoD.
+  FILTER (?duracaoD = ?Duracao).
   {
-  SELECT (MAX(?duracao) as ?max_duracao)
+  SELECT (MAX(?duracaoD) as ?Duracao)
     WHERE{
-      onto:ethan_coen onto:dirige ?filme.
-      ?filme onto:temDuracao ?duracao.
+      BIND (onto:ethan_coen AS ?D)
+      ?D onto:dirige ?Filme.
+      ?Filme onto:temDuracao ?duracaoD.
     }
   }
 }
+
 \end{verbatim}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+    \hline
+    Filme & Duracao\\
+    \hline
+    filme\_paris\_je\_t\_aime & 120\\
+    \hline
+\end{tabular}
+\end{center}
 
 \end{document}
