@@ -157,13 +157,16 @@ PREFIX onto: <http://www.semanticweb.org/lincolnyuji/ontologies/2021/10/cinema-o
 \end{verbatim}
 
 \subsection*{Query 1}
-Quais os títulos dos filmes que foram dirigidos pelo diretor \textbf{D}, em ordem lexicográfica?
-Com \textbf{D} = onto:ethan\_coen:
+Quais os \underline{títulos} dos filmes que foram dirigidos pelo diretor \textbf{D}, em ordem lexicográfica?\\
+
+\noindent Para \textbf{D} = \verb|onto:ethan_coen|:
 \begin{verbatim}
 SELECT ?TituloDoFilme
 WHERE
 {
   BIND (onto:ethan_coen AS ?D)
+  ?filme rdf:type onto:Filme.
+  ?D rdf:type onto:Diretor.
   ?D onto:dirige ?filme.
   ?filme onto:temTitulo ?TituloDoFilme.
 }
@@ -190,18 +193,21 @@ ORDER BY ?TituloDoFilme
 \end{center}
 
 \subsection*{Query 2}
-Quais os primeiros nomes e últimos nomes dos atores que participaram do filme de título \textbf{F\textsubscript{t}}, em ordem lexicográfica de nome e sobrenome, com seus respectivos personagens?
-Com \textbf{F\textsubscript{t}} = "American Beauty".
+Quais os \underline{primeiros nomes} e \underline{últimos nomes} dos atores que participaram do filme de título \textbf{F\textsubscript{t}}, em ordem lexicográfica de nome e sobrenome, com seus respectivos \underline{personagens}?\\
+
+\noindent Para \textbf{F\textsubscript{t}} = \verb|"American Beauty"|:
 \begin{verbatim}
 SELECT ?PrimeiroNome ?UltimoNome ?Personagem
 WHERE
 {
   BIND ("American Beauty" AS ?Ft)
+  ?filme rdf:type onto:Filme.
+  ?ator rdf:type onto:Ator.
   ?filme onto:temTitulo ?Ft.
-  ?pessoa onto:atuaEm ?filme.
-  ?pessoa onto:temPrimeiroNome ?PrimeiroNome.
-  ?pessoa onto:temSobrenome ?UltimoNome.
-  ?pessoa onto:interpreta ?Personagem.
+  ?ator onto:atuaEm ?filme.
+  ?ator onto:temPrimeiroNome ?PrimeiroNome.
+  ?ator onto:temSobrenome ?UltimoNome.
+  ?ator onto:interpreta ?Personagem.
 }
 ORDER BY ?PrimeiroNome ?UltimoNome
 \end{verbatim}
@@ -258,9 +264,9 @@ ORDER BY ?PrimeiroNome ?UltimoNome
 \end{center}
 
 \subsection*{Query 3}
-Em quais filmes os atores \textbf{X} e \textbf{Y} atuaram juntos, com os respectivos diretores e anos de lançamento, do mais novo para o mais antigo?
+Em quais \underline{filmes} os atores \textbf{X} e \textbf{Y} atuaram juntos, com os respectivos \underline{diretores} e \underline{anos} de lançamento, do mais novo para o mais antigo?\\
 
-Com \textbf{X} = onto:ben\_gazzara e \textbf{Y} = onto:steve\_buscemi
+\noindent Para \textbf{X} = \verb|onto:ben_gazzara| e \textbf{Y} = \verb|onto:steve_buscemi|:
 
 \begin{verbatim}
 SELECT ?Filme ?Diretor ?Ano
@@ -268,6 +274,10 @@ WHERE
 {
   BIND (onto:ben_gazzara AS ?X)
   BIND (onto:steve_buscemi AS ?Y)
+  ?X rdf:type onto:Ator.
+  ?Y rdf:type onto:Ator.
+  ?Diretor rdf:type onto:Diretor.
+  ?Filme rdf:type onto:Filme.
   ?X onto:atuaEm ?Filme.
   ?Y onto:atuaEm ?Filme.
   FILTER (?X != ?Y).
@@ -275,8 +285,6 @@ WHERE
   ?Filme onto:temAnoDeLancamento ?Ano.
 }
 ORDER BY DESC(?Ano)
-
-
 \end{verbatim}
 
 \begin{center}
@@ -311,9 +319,10 @@ ORDER BY DESC(?Ano)
 \end{center}
 
 \subsection*{Query 4}
-Quais filmes do diretor do filme \textbf{F} possuem \textbf{X} ou \textbf{Y} como atores, com as respectivas durações em ordem crescente?
+Quais \underline{filmes} do diretor do filme \textbf{F} possuem \textbf{X} ou \textbf{Y} como atores, com as respectivas \underline{durações} em ordem crescente?\\
 
-Com \textbf{F} = onto:filme\_her, \textbf{X} = onto:amy\_addams e \textbf{Y} = onto:tim\_szczepanski.
+\noindent Para \textbf{F} = \verb|onto:filme_her|, \textbf{X} = \verb|onto:amy_addams| e \textbf{Y} = \verb|onto:tim_szczepanski|:
+
 \begin{verbatim}
 SELECT ?Filme ?Duracao
 WHERE
@@ -321,6 +330,11 @@ WHERE
   BIND (onto:filme_her AS ?F)
   BIND (onto:amy_addams AS ?X)
   BIND (onto:tim_szczepanski AS ?Y)
+  ?Diretor rdf:type onto:Diretor.
+  ?Filme rdf:type onto:Filme.
+  ?F rdf:type onto:Filme.
+  ?X rdf:type onto:Ator.
+  ?Y rdf:type onto:Ator.
   ?Diretor onto:dirige ?F.
   ?Filme onto:dirigidoPor ?Diretor.
   {?X onto:atuaEm ?Filme} UNION {?Y onto:atuaEm ?Filme}.
@@ -341,11 +355,15 @@ ORDER BY ?Duracao
 \end{center}
 
 \subsection*{Query 5}
-Quais pessoas atuaram em um filme e dirigiram algum filme (não necessariamente o mesmo filme, mas obrigatoriamente a mesma pessoa)?
+Quais \underline{pessoas} atuaram em um \underline{filme} e dirigiram algum \underline{filme} (não necessariamente o mesmo filme, mas obrigatoriamente a mesma pessoa)?
+
 \begin{verbatim}
 SELECT DISTINCT ?Pessoa (SAMPLE(?filme1) AS ?FilmeAt) (SAMPLE(?filme2) AS ?FilmeDir)
 WHERE
 {
+  ?Pessoa rdf:type foaf:Person.
+  ?filme1 rdf:type onto:Filme.
+  ?filme2 rdf:type onto:Filme.
   ?Pessoa onto:atuaEm ?filme1.
   ?filme2 onto:dirigidoPor ?Pessoa.
 }
@@ -380,7 +398,10 @@ GROUP BY ?Pessoa
 \end{center}
 
 \subsection*{Query 6}
-Quais diretores dirigiram algum filme em um ano entre os anos \textbf{N\textsubscript{1}} e \textbf{N\textsubscript{2}},  em que os atores \textbf{X} e \text{Y} aparecem, do mais antigo para o mais novo?
+Quais \underline{diretores} dirigiram algum \underline{filme} em um \underline{ano} entre os anos \textbf{N\textsubscript{1}} e \textbf{N\textsubscript{2}},  em que os atores \textbf{X} e \text{Y} aparecem, do mais antigo para o mais novo?\\
+
+\noindent Para \textbf{N\textsubscript{1}} = \verb|1901|, \textbf{N\textsubscript{2}} = \verb|2000|, \textbf{X} = \verb|onto:a_j_cook| e \text{Y} = \verb|onto:allen_stewart_coates|:
+
 \begin{verbatim}
 SELECT DISTINCT ?Ano ?Diretor ?Filme
 WHERE
@@ -389,6 +410,10 @@ WHERE
   BIND (2000 AS ?N2)
   BIND (onto:a_j_cook AS ?X)
   BIND (onto:allen_stewart_coates AS ?Y)
+  ?X rdf:type onto:Ator.
+  ?Y rdf:type onto:Ator.
+  ?Filme rdf:type onto:Filme.
+  ?Diretor rdf:type onto:Diretor.
   ?Filme onto:temAnoDeLancamento ?Ano.
   FILTER (?Ano <= ?N2).
   FILTER (?Ano >= ?N1).
@@ -410,36 +435,88 @@ ORDER BY ?Ano
 \end{center}
 
 \subsection*{Query 7}
-Quais pares formados por uma uma atriz e um ator atuaram juntos em algum filme de duração entre \textbf{M1} e \textbf{M2}?
+Quais pares formados por uma uma \underline{atriz} e um \underline{ator} atuaram juntos em algum \underline{filme} de \underline{duração} entre \textbf{M1} e \textbf{M2}?\\
+
+\noindent Para \textbf{M1} = \verb|149| e \textbf{M2} = \verb|157|:
+
 \begin{verbatim}
 SELECT ?Atriz ?Ator ?Filme ?Duracao
 WHERE
 {
-  ?atriz rdf:type onto:Mulher.
-  ?ator rdf:type onto:Homem.
-  ?atriz onto:atuaEm ?filme.
-  ?ator onto:atuaEm ?filme.
-  ?filme onto:temDuracao ?duracao.
-  FILTER (?duracao <= 120).
-  FILTER (?duracao >= 80).
+  BIND (149 AS ?M1)
+  BIND (157 AS ?M2)
+  ?Atriz rdf:type onto:Mulher.
+  ?Atriz rdf:type onto:Ator.
+  ?Ator rdf:type onto:Homem.
+  ?Ator rdf:type onto:Ator.
+  ?Filme rdf:type onto:Filme.
+  ?Atriz onto:atuaEm ?Filme.
+  ?Ator onto:atuaEm ?Filme.
+  ?Filme onto:temDuracao ?Duracao.
+  FILTER (?Duracao >= ?M1).
+  FILTER (?Duracao <= ?M2).
 }
-ORDER BY ?duracao
+ORDER BY ?Duracao
 \end{verbatim}
 
-\subsection*{Query 8}
-Qual o diretor que mais dirigiu filmes em que aparece o ator de primeiro nome \textbf{X\textsubscript{p}} e último nome \textbf{X\textsubscript{u}}?
+\begin{center}
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+        \hline
+        Atriz & Ator & Filme & Duracao \\
+        \hline
+        audrey\_tautou & alfred\_molina & filme\_the\_da\_vinci\_code & 149 \\
+        audrey\_tautou & ian\_mckellen & filme\_the\_da\_vinci\_code & 149 \\
+        audrey\_tautou & jean\_reno & filme\_the\_da\_vinci\_code & 149 \\
+        audrey\_tautou & jean\_yves\_berteloot & filme\_the\_da\_vinci\_code & 149 \\
+        audrey\_tautou & jurgen\_prochnow & filme\_the\_da\_vinci\_code & 149 \\
+        audrey\_tautou & paul\_bettany & filme\_the\_da\_vinci\_code & 149 \\
+        audrey\_tautou & tom\_hanks & filme\_the\_da\_vinci\_code & 149 \\
+        barbara\_garrick & afemo\_omilami & filme\_the\_firm & 154 \\
+        debbie\_turner & afemo\_omilami & filme\_the\_firm & 154 \\
+        deborah\_thomas & afemo\_omilami & filme\_the\_firm & 154 \\
+        erin\_branham & afemo\_omilami & filme\_the\_firm & 154 \\
+        holly\_hunter & afemo\_omilami & filme\_the\_firm & 154 \\
+        janie\_paris & afemo\_omilami & filme\_the\_firm & 154 \\
+        \vdots & \vdots & \vdots &  \vdots\\
+        susan\_elliott & wilford\_brimley & filme\_the\_firm & 154 \\
+        terri\_welles & wilford\_brimley & filme\_the\_firm & 154 \\
+        barbara\_garrick & william\_r\_booth & filme\_the\_firm & 154 \\
+        debbie\_turner & william\_r\_booth & filme\_the\_firm & 154 \\
+        deborah\_thomas & william\_r\_booth & filme\_the\_firm & 154 \\
+        erin\_branham & william\_r\_booth & filme\_the\_firm & 154 \\
+        holly\_hunter & william\_r\_booth & filme\_the\_firm & 154 \\
+        janie\_paris & william\_r\_booth & filme\_the\_firm & 154 \\
+        jeane\_aufdenberg & william\_r\_booth & filme\_the\_firm & 154 \\
+        jeanne\_tripplehorn & william\_r\_booth & filme\_the\_firm & 154 \\
+        joey\_anderson & william\_r\_booth & filme\_the\_firm & 154 \\
+        julia\_hayes & william\_r\_booth & filme\_the\_firm & 154 \\
+        karina\_lombard & william\_r\_booth & filme\_the\_firm & 154 \\
+        margo\_martindale & william\_r\_booth & filme\_the\_firm & 154 \\
+        rebecca\_glenn & william\_r\_booth & filme\_the\_firm & 154 \\
+        susan\_elliott & william\_r\_booth & filme\_the\_firm & 154 \\
+        terri\_welles & william\_r\_booth & filme\_the\_firm & 154 \\
+        \hline
+    \end{tabular}
+\end{center}
 
-Com \textbf{X\textsubscript{p}} = Vincent, \textbf{X\textsubscript{u}} = Coppola
+\subsection*{Query 8}
+Qual o \underline{diretor} que mais dirigiu filmes em que aparece o ator de primeiro nome \textbf{X\textsubscript{p}} e último nome \textbf{X\textsubscript{u}}?\\
+
+\noindent Para \textbf{X\textsubscript{p}} = \verb|"Vincent"|, \textbf{X\textsubscript{u}} = \verb|"Coppola"|:
+
 \begin{verbatim}
 SELECT ?Diretor
 WHERE
 {
   BIND ("Vincent" AS ?XP)
   BIND ("Coppola" AS ?XU)
-  ?pessoa rdf:type foaf:Person.
-  ?pessoa onto:atuaEm ?filme.
-  ?pessoa onto:temPrimeiroNome ?XP.
-  ?pessoa onto:temSobrenome ?XU.
+  ?ator rdf:type onto:Ator.
+  ?filme rdf:type onto:Filme.
+  ?Diretor rdf:type onto:Diretor.
+  ?ator onto:atuaEm ?filme.
+  ?ator onto:temPrimeiroNome ?XP.
+  ?ator onto:temSobrenome ?XU.
   ?Diretor onto:dirige ?filme.
 }
 GROUP BY ?Diretor
@@ -458,13 +535,17 @@ LIMIT 1
 \end{center}
 
 \subsection*{Query 9}
-Qual o filme mais antigo em que o ator \textbf{X} atuou, em que ano foi lançado e qual era seu personagem? Havendo empate, devolver todos.
-Com \textbf{X} = onto:alan\_rachins.
+Qual o \underline{filme} mais antigo em que o ator \textbf{X} atuou, em que \underline{ano} foi lançado e qual era seu \underline{personagem}? Havendo empate, devolver todos.\\
+
+\noindent Para \textbf{X} = \verb|onto:alan_rachins|:
+
 \begin{verbatim}
 SELECT ?Filme ?Ano ?Personagem
 WHERE
 {
   BIND (onto:alan_rachins AS ?X).
+  ?X rdf:type onto:Ator.
+  ?Filme rdf:type onto:Filme.
   ?X onto:atuaEm ?Filme.
   ?X onto:interpreta ?Personagem.
   ?Filme onto:temAnoDeLancamento ?anoD.
@@ -492,14 +573,17 @@ WHERE
 \end{center}
 
 \subsection*{Query 10}
-Qual o filme mais longo dirigido por \textbf{D}, e qual a sua duração? Havendo empate, devolver todos da mesma duração.
+Qual o \underline{filme} mais longo dirigido por \textbf{D}, e qual a sua \underline{duração}? Havendo empate, devolver todos da mesma duração.\\
 
-Para \textbf{D} = onto:ethan\_coen.
+\noindent Para \textbf{D} = \verb|onto:ethan_coen|:
+
 \begin{verbatim}
 SELECT ?Filme ?Duracao
 WHERE
 {
   BIND (onto:ethan_coen AS ?D)
+  ?D rdf:type onto:Diretor.
+  ?Filme rdf:type onto:Filme.
   ?D onto:dirige ?Filme.
   ?Filme onto:temDuracao ?duracaoD.
   FILTER (?duracaoD = ?Duracao).
@@ -512,7 +596,6 @@ WHERE
     }
   }
 }
-
 \end{verbatim}
 
 \begin{center}

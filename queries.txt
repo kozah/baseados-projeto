@@ -1,0 +1,209 @@
+PREFIX  rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX onto: <http://www.semanticweb.org/lincolnyuji/ontologies/2021/10/cinema-ontology#>
+
+# Primeira query
+# D = onto:ethan_coen
+
+SELECT ?TituloDoFilme
+WHERE
+{
+  BIND (onto:ethan_coen AS ?D)
+  ?filme rdf:type onto:Filme.
+  ?D rdf:type onto:Diretor.
+  ?D onto:dirige ?filme.
+  ?filme onto:temTitulo ?TituloDoFilme.
+}
+ORDER BY ?TituloDoFilme
+
+# Segunda query
+# Ft = "American Beauty"
+
+SELECT ?PrimeiroNome ?UltimoNome ?Personagem
+WHERE
+{
+  BIND ("American Beauty" AS ?Ft)
+  ?filme rdf:type onto:Filme.
+  ?ator rdf:type onto:Ator.
+  ?filme onto:temTitulo ?Ft.
+  ?ator onto:atuaEm ?filme.
+  ?ator onto:temPrimeiroNome ?PrimeiroNome.
+  ?ator onto:temSobrenome ?UltimoNome.
+  ?ator onto:interpreta ?Personagem.
+}
+ORDER BY ?PrimeiroNome ?UltimoNome
+
+# Terceira query
+# X = onto:ben_gazzara
+# Y = onto:steve_buscemi
+
+SELECT ?Filme ?Diretor ?Ano
+WHERE
+{
+  BIND (onto:ben_gazzara AS ?X)
+  BIND (onto:steve_buscemi AS ?Y)
+  ?X rdf:type onto:Ator.
+  ?Y rdf:type onto:Ator.
+  ?Diretor rdf:type onto:Diretor.
+  ?Filme rdf:type onto:Filme.
+  ?X onto:atuaEm ?Filme.
+  ?Y onto:atuaEm ?Filme.
+  FILTER (?X != ?Y).
+  ?Diretor onto:dirige ?Filme.
+  ?Filme onto:temAnoDeLancamento ?Ano.
+}
+ORDER BY DESC(?Ano)
+
+# Quarta query
+# F = onto:filme_her
+# X = onto:amy_addams
+# Y = onto:tim_szczepanski
+
+SELECT ?Filme ?Duracao
+WHERE
+{
+  BIND (onto:filme_her AS ?F)
+  BIND (onto:amy_addams AS ?X)
+  BIND (onto:tim_szczepanski AS ?Y)
+  ?Diretor rdf:type onto:Diretor.
+  ?Filme rdf:type onto:Filme.
+  ?F rdf:type onto:Filme.
+  ?X rdf:type onto:Ator.
+  ?Y rdf:type onto:Ator.
+  ?Diretor onto:dirige ?F.
+  ?Filme onto:dirigidoPor ?Diretor.
+  {?X onto:atuaEm ?Filme} UNION {?Y onto:atuaEm ?Filme}.
+  ?Filme onto:temDuracao ?Duracao.
+}
+ORDER BY ?Duracao
+
+# Quinta query
+
+SELECT DISTINCT ?Pessoa (SAMPLE(?filme1) AS ?FilmeAt) (SAMPLE(?filme2) AS ?FilmeDir)
+WHERE
+{
+  ?Pessoa rdf:type foaf:Person.
+  ?filme1 rdf:type onto:Filme.
+  ?filme2 rdf:type onto:Filme.
+  ?Pessoa onto:atuaEm ?filme1.
+  ?filme2 onto:dirigidoPor ?Pessoa.
+}
+GROUP BY ?Pessoa
+
+# Sexta query
+# N1 = 1901
+# N2 = 2000
+# X = onto:a_j_cook
+# Y = onto:allen_stewart_coates
+
+SELECT DISTINCT ?Ano ?Diretor ?Filme
+WHERE
+{
+  BIND (1901 AS ?N1)
+  BIND (2000 AS ?N2)
+  BIND (onto:a_j_cook AS ?X)
+  BIND (onto:allen_stewart_coates AS ?Y)
+  ?X rdf:type onto:Ator.
+  ?Y rdf:type onto:Ator.
+  ?Filme rdf:type onto:Filme.
+  ?Diretor rdf:type onto:Diretor.
+  ?Filme onto:temAnoDeLancamento ?Ano.
+  FILTER (?Ano <= ?N2).
+  FILTER (?Ano >= ?N1).
+  ?X onto:atuaEm ?Filme.
+  ?Y onto:atuaEm ?Filme.
+  ?Filme onto:dirigidoPor ?Diretor
+}
+ORDER BY ?Ano
+
+# Sétima query
+# M1 = 149
+# M2 = 157
+
+SELECT ?Atriz ?Ator ?Filme ?Duracao
+WHERE
+{
+  BIND (149 AS ?M1)
+  BIND (157 AS ?M2)
+  ?Atriz rdf:type onto:Mulher.
+  ?Atriz rdf:type onto:Ator.
+  ?Ator rdf:type onto:Homem.
+  ?Ator rdf:type onto:Ator.
+  ?Filme rdf:type onto:Filme.
+  ?Atriz onto:atuaEm ?Filme.
+  ?Ator onto:atuaEm ?Filme.
+  ?Filme onto:temDuracao ?Duracao.
+  FILTER (?Duracao >= ?M1).
+  FILTER (?Duracao <= ?M2).
+}
+ORDER BY ?Duracao
+
+# Oitava query
+# XP = Vincent
+# XU = Coppola
+
+SELECT ?Diretor
+WHERE
+{
+  BIND ("Vincent" AS ?XP)
+  BIND ("Coppola" AS ?XU)
+  ?ator rdf:type onto:Ator.
+  ?filme rdf:type onto:Filme.
+  ?Diretor rdf:type onto:Diretor.
+  ?ator onto:atuaEm ?filme.
+  ?ator onto:temPrimeiroNome ?XP.
+  ?ator onto:temSobrenome ?XU.
+  ?Diretor onto:dirige ?filme.
+}
+GROUP BY ?Diretor
+ORDER BY DESC(COUNT(?filme))
+LIMIT 1
+
+# Nona query
+# X = onto:alan_rachins
+
+SELECT ?Filme ?Ano ?Personagem
+WHERE
+{
+  BIND (onto:alan_rachins AS ?X).
+  ?X rdf:type onto:Ator.
+  ?Filme rdf:type onto:Filme.
+  ?X onto:atuaEm ?Filme.
+  ?X onto:interpreta ?Personagem.
+  ?Filme onto:temAnoDeLancamento ?anoD.
+  FILTER (?anoD = ?Ano).
+  {
+  SELECT (MIN(?anoD) as ?Ano)
+    WHERE
+    {
+      BIND (onto:alan_rachins AS ?X).
+      ?X onto:atuaEm ?Filme.
+      ?Filme onto:temAnoDeLancamento ?anoD.
+    }
+  }
+}
+
+# Décima query
+# D = onto:ethan_coen
+
+SELECT ?Filme ?Duracao
+WHERE
+{
+  BIND (onto:ethan_coen AS ?D)
+  ?D rdf:type onto:Diretor.
+  ?Filme rdf:type onto:Filme.
+  ?D onto:dirige ?Filme.
+  ?Filme onto:temDuracao ?duracaoD.
+  FILTER (?duracaoD = ?Duracao).
+  {
+  SELECT (MAX(?duracaoD) as ?Duracao)
+    WHERE{
+      BIND (onto:ethan_coen AS ?D)
+      ?D onto:dirige ?Filme.
+      ?Filme onto:temDuracao ?duracaoD.
+    }
+  }
+}
