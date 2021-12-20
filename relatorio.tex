@@ -9,9 +9,9 @@
 \begin{document}
 \title{MAC0444 - Sistemas Baseados em Conhecimento \\ \large{Relatório do Projeto}}
 
-\author{Lincoln Oliveira - NUSP: \\
-    Marcos Castello - NUSP: \\
-    Matheus S. Freire - NUSP: \\
+\author{Lincoln Yuji de Oliveira - NUSP: 11795439\\
+    Marcos Henrique Castello - NUSP: 11443210\\
+    Mateus Santos Freire - NUSP: 11796889 \\
     Natália Hitomi Koza - NUSP: 10698432}
 \maketitle
 
@@ -19,6 +19,7 @@
 
 Somente referenciamos a ontologia FOAF.
 
+\subsection*{Conceitos}
 
 \vspace{0.5cm}
 \begin{center}
@@ -58,6 +59,8 @@ Somente referenciamos a ontologia FOAF.
 \end{tabular}
 \end{center}
 
+\subsection*{Propriedades}
+
 \vspace{0.5cm}
 \begin{center}
 \begin{tabular}{cl}
@@ -65,6 +68,7 @@ Somente referenciamos a ontologia FOAF.
     \hline
     atuaEm &
         \begin{tabular}{l}
+            Indica que o Ator atua no Filme\\
             subpropriedade de \verb|foaf:made|\\
             inversa de atuadoPor\\
             propriedade assimétrica\\
@@ -74,11 +78,13 @@ Somente referenciamos a ontologia FOAF.
     \hline
     atuadoPor &
         \begin{tabular}{l}
+            Indica que o Filme é atuado pelo Ator\\
             subpropriedade de \verb|foaf:maker|
         \end{tabular}\\
     \hline
     dirige &
         \begin{tabular}{l}
+            Indica que o Diretor dirige o Filme\\
             subpropriedade de \verb|foaf:made|\\
             inversa de dirigidoPor\\
             domínio: Diretor\\
@@ -87,11 +93,13 @@ Somente referenciamos a ontologia FOAF.
     \hline
     dirigidoPor &
         \begin{tabular}{l}
+            Indica que o Filme é dirigido pelo Diretor\\
             subpropriedade de \verb|foaf:maker|
         \end{tabular}\\
     \hline
     interpreta &
         \begin{tabular}{l}
+            Indica que o Ator interpreta o Personagem\\
             subpropriedade de \verb|foaf:made|\\
             inversa de interpretadoPor\\
             domínio: Ator\\
@@ -100,11 +108,13 @@ Somente referenciamos a ontologia FOAF.
     \hline
     interpretadoPor &
         \begin{tabular}{l}
+            Indica que o Personagem é interpretado pelo Ator\\
             subpropriedade de \verb|foaf:maker|
         \end{tabular}\\
     \hline
     temAnoDeLancamento &
         \begin{tabular}{l}
+            Indica que o Filme tem como ano de lançamento esse número inteiro\\
             tipo: owl:FunctionalProperty\\
             domínio: Filme\\
             range: inteiro
@@ -112,12 +122,14 @@ Somente referenciamos a ontologia FOAF.
     \hline
     temDuracao &
         \begin{tabular}{l}
+            Indica que o Filme tem como duração esse número inteiro de minutos\\
         domínio: Filme\\
         range: inteiro
         \end{tabular}\\
     \hline
     temPrimeiroNome &
         \begin{tabular}{l}
+            Indica que a Pessoa tem como primeiro nome essa string\\
             subpropriedade de \verb|foaf:firstName|\\
             tipo: owl:FunctionalProperty\\
             domínio: \verb|foaf:Person|\\
@@ -126,6 +138,7 @@ Somente referenciamos a ontologia FOAF.
     \hline
     temSobrenome &
         \begin{tabular}{l}
+            Indica que a Pessoa tem como sobrenome essa string\\
             subpropriedade de \verb|foaf:familyName|\\
             tipo: owl:FunctionalProperty\\
             domínio: \verb|foaf:Person|\\
@@ -134,6 +147,7 @@ Somente referenciamos a ontologia FOAF.
     \hline
     temTitulo &
         \begin{tabular}{l}
+            Indica que o Filme tem como título essa string\\
             domínio: Filme\\
             range: string
         \end{tabular}\\
@@ -141,8 +155,71 @@ Somente referenciamos a ontologia FOAF.
 \end{tabular}
 \end{center}
 
-Instâncias:
+\newpage
+\subsection*{Instâncias}
 
+Dada a planilha de dados para popular as classes, os indivíduos estão mapeados da seguinte forma:
+
+\begin{itemize}
+    \item filmes
+    \begin{center}
+        \begin{tabular}{|cccc|}
+            \hline
+            A & B & C & D	\\
+            \hline
+            filme & Ano	& Título & Duração	\\
+            american\_beauty & 1999 & American Beauty & 122	\\
+            anna & 1987 & Anna & 100	\\
+            \vdots & \vdots & \vdots & \vdots\\
+            \hline
+        \end{tabular}
+    \end{center}
+        Possuem tipo Filme, são identificados pela coluna A prefixado com \verb|filme\_|, tem como ano de lançamento a coluna B, possuem a coluna C como título e tem duração D.
+    \item diretores
+    \begin{center}
+        \begin{tabular}{|cccc|}
+            \hline
+            A & B & C & D\\
+            \hline
+            diretor	& filme & nome & sobrenome\\
+            sam\_mendes & american\_beauty & Sam	& Mendes\\
+            yurek\_bogayevicz & anna	& Yurek	& Bogayevicz            \\
+            \vdots & \vdots & \vdots & \vdots\\
+            \hline
+        \end{tabular}
+    \end{center}
+    São do tipo Diretor, são identificados pela coluna A, dirigem o filme da coluna B, tem primeiro nome C e sobrenome D.
+    \item atrizes
+    \begin{center}
+        \begin{tabular}{|cccccc|}
+            \hline
+            A & B & C & D & E & F\\
+            \hline
+            atriz&filme&personagem&nome&sobrenome&id\\
+            annette\_bening&american\_beauty&carolyn\_burnham&Annette&	Bening	&annette\_ \dots \_burnham\\
+            thora\_birch&	american\_beauty	&jane\_burnham&	Thora&	Birch&	thora\_b \dots \_burnham	\\
+            \vdots & \vdots & \vdots & \vdots & \vdots & \vdots\\
+            \hline
+        \end{tabular}
+    \end{center}
+    Indivíduos dos tipos Mulher e Ator, identificado pela coluna A, atua no filme B com o personagem C, possui primeiro nome D e sobrenome E.
+    \item atores
+    \begin{center}
+        \begin{tabular}{|cccccc|}
+            \hline
+            A & B & C & D & E & F\\
+            \hline
+            ator & filme & personagem & nome & sobrenome & id\\
+            kevin\_spacey & american\_beauty & lester\_burnham	& Kevin & Spacey &kevin\_space\dots ster\_burnham\\
+            wes\_bentley & american\_beauty & ricky\_fitts & Wes &Bentley & wes\_bentleyam\dots yricky\_fitts\\
+            \vdots & \vdots & \vdots & \vdots & \vdots & \vdots\\
+    \hline
+        \end{tabular}
+    \end{center}
+    São dos tipos Ator e Homem, identificado pela coluna A, atua no filme B com o personagem C, possui primeiro nome D e sobrenome E.
+\end{itemize}
+
+\newpage
 \section*{Consultas}
 
 Para todas as consultas os prefixos são:
